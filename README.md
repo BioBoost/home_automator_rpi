@@ -27,3 +27,17 @@ By passing the `privileged` we give the docker image access to GPIO and I2C
 ```shell
 docker run -d --privileged --restart unless-stopped --name automator home_automator
 ```
+
+### Development with Docker-compose
+
+To get a development build environment fire the docker container up as follows:
+
+```shell
+docker-compose run build /bin/bash
+```
+
+Now you get a bash shell to start building using make. Once finished and you wish to start the container normally:
+
+```shell
+docker-compose -d up
+```

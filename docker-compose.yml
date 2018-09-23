@@ -1,0 +1,7 @@
+version: '3'
+services:
+  build:
+    image: "home_automator:latest"
+    volumes:
+      - .:/app
+    privileged: true
