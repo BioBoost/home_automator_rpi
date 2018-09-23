@@ -28,6 +28,13 @@ sudo usermod -aG docker pi
 
 After making this change, log out and reconnect with ssh.
 
+Installing docker-compose
+
+```shell
+sudo apt install python-pip
+sudo pip install docker-compose
+```
+
 ## I2c in Docker
 
 As a security precaution, system devices are not exposed by default inside Docker containers. You can expose specific devices to your container using the --device option to docker run, as in:
