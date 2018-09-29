@@ -2,7 +2,7 @@
 
 #include <sys/time.h>
 #include <string>
-#include "expansion_card.h"
+#include "../expansion_card.h"
 
 namespace BiosHomeAutomator {
 

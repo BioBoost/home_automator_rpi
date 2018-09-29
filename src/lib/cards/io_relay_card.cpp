@@ -6,7 +6,7 @@ namespace BiosHomeAutomator {
     : ExpansionCard(id), ioExpander(ioExpanderAddress, "/dev/i2c-1") {
 
     // Configure outputs and set outputs low
-    unsigned int mask = 0x03FF;
+    unsigned int mask = EXPANDER_PORT_MASK;
     ioExpander.set_port_direction(mask);
     all_relays_off();
 

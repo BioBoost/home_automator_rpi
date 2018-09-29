@@ -4,7 +4,7 @@
 #include "../drivers/pcf8575.h"
 #include <string>
 #include <vector>
-#include "input.h"
+#include "io/input.h"
 
 namespace BiosHomeAutomator {
 
@@ -13,6 +13,7 @@ namespace BiosHomeAutomator {
     private:
       static const unsigned int NUMBER_OF_INPUTS = 10;
       static const unsigned int NUMBER_OF_RELAYS = 6;
+      static const unsigned int EXPANDER_PORT_MASK = 0x03FF;
 
     private:
       IOExpansion::PCF8575 ioExpander;
