@@ -15,7 +15,7 @@ namespace BiosHomeAutomator {
       static const unsigned int NUMBER_OF_RELAYS = 6;
 
     private:
-      PCF8575 ioExpander;
+      IOExpansion::PCF8575 ioExpander;
       unsigned int outputData;
       unsigned int id;
       std::vector<Input*> inputs;

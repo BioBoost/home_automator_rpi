@@ -6,7 +6,7 @@
 #include <unistd.h>         // Read and write
 #include <bios_logger/logger.h>
 
-namespace BiosHomeAutomator {
+namespace HAL {
 
   /*
    * Pointer to write function used for i2c communication.

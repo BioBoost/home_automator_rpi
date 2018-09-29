@@ -1,15 +1,15 @@
 #pragma once
 
-#include "../i2c/i2c_endpoint.h"
+#include "../hal/i2c/i2c_endpoint.h"
 
-namespace BiosHomeAutomator {
+namespace IOExpansion {
 
   class PCF8575 {
     public:
       const static unsigned int ALL_INPUTS = 0xFFFF;
 
     private:
-      I2cEndpoint i2cEndpoint;
+      HAL::I2cEndpoint i2cEndpoint;
       unsigned int directionMask;    // Outputs are 0, Inputs are 1
 
     public:

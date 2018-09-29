@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace BiosHomeAutomator {
+namespace HAL {
 
   class I2cEndpoint {
 

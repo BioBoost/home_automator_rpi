@@ -3,7 +3,7 @@
 #include <string>
 #include <bios_logger/logger.h>
 
-namespace BiosHomeAutomator {
+namespace IOExpansion {
 
   PCF8575::PCF8575(unsigned int address, std::string filename)
     : i2cEndpoint(address, filename) {
