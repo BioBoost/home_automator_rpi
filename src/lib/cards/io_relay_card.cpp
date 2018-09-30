@@ -1,9 +1,10 @@
 #include "io_relay_card.h"
+#include <bios_logger/logger.h>
 
 namespace BiosHomeAutomator {
 
-  IORelayCard::IORelayCard(unsigned int ioExpanderAddress, unsigned int id)
-    : ExpansionCard(id), ioExpander(ioExpanderAddress, "/dev/i2c-1") {
+  IORelayCard::IORelayCard(unsigned int ioExpanderAddress, unsigned int id, int isrPin)
+    : ExpansionCard(id), ioExpander(ioExpanderAddress, "/dev/i2c-1", isrPin, this, &IORelayCard::expander_interrupt_handler) {
 
     // Configure outputs and set outputs low
     unsigned int mask = EXPANDER_PORT_MASK;
@@ -11,6 +12,13 @@ namespace BiosHomeAutomator {
     all_relays_off();
 
     initialize_inputs();
+  }
+
+  void IORelayCard::expander_interrupt_handler(void) {
+    BiosLogger::DoLog.info("Interrupt reached IO RelayCard");
+    if (changeHandler) {
+      changeHandler(this);
+    }
   }
 
   void IORelayCard::initialize_inputs(void) {

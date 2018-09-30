@@ -20,9 +20,10 @@ namespace BiosHomeAutomator {
       unsigned int outputData;
       unsigned int id;
       std::vector<Input*> inputs;
+      std::function<void(ExpansionCard * card)> changeHandler;
 
     public:
-      IORelayCard(unsigned int ioExpanderAddress, unsigned int id);
+      IORelayCard(unsigned int ioExpanderAddress, unsigned int id, int isrPin);
       virtual ~IORelayCard(void);
 
     public:
@@ -31,6 +32,13 @@ namespace BiosHomeAutomator {
       void toggle_relay(unsigned int relay);
       void all_relays_off(void);
       std::vector<Input*> get_changed_inputs(void);
+
+      void expander_interrupt_handler(void);
+
+      template<typename C>
+      void register_change_handler(C *object, void(C::*method)(ExpansionCard * card)) {
+        changeHandler = std::bind(method, object, std::placeholders::_1);
+      }
 
     private:
       void initialize_inputs(void);

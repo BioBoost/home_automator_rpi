@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include "../hal/io_relay_card.h"
+#include "../cards/io_relay_card.h"
 #include "events/event.h"
 #include "../mqtt/mqtt_channel.h"
 #include <simple_mqtt_client/simple_mqtt_client.h>
@@ -20,7 +20,7 @@ namespace BiosHomeAutomator {
 
     public:
       void add_card(IORelayCard * relayCard);
-      void process_changed_inputs(void);
+      void process_changed_inputs(ExpansionCard * card);
 
     public:
       void handle_mqtt_message(BiosSimpleMqttClient::MQTTMessage mqttMessage) override;

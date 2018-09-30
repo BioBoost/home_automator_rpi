@@ -1,7 +1,7 @@
 #pragma once
 
 #include "event.h"
-#include "../../hal/io_relay_card.h"
+#include "../../cards/io_relay_card.h"
 #include <bios_logger/logger.h>
 
 namespace BiosHomeAutomator {

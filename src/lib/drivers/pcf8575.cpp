@@ -6,7 +6,7 @@
 namespace IOExpansion {
 
   PCF8575::PCF8575(unsigned int address, std::string filename)
-    : i2cEndpoint(address, filename) {
+    : i2cEndpoint(address, filename), interrupt(nullptr) {
 
     if (!i2cEndpoint.open()) {    // Later exception here
       BiosLogger::DoLog.error("Failed to open i2c endpoint on bus " + filename + " with address " + std::to_string(address));
@@ -14,6 +14,11 @@ namespace IOExpansion {
       set_all_as_inputs();
       write_port(0xFFFF);
     }
+  }
+
+  PCF8575::~PCF8575(void) {
+    // Can we unregister interrupt here ?
+    delete interrupt;
   }
 
   unsigned int PCF8575::read_port(void) {

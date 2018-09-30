@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../hal/i2c/i2c_endpoint.h"
+#include "../hal/interrupts/hardware_interrupt.h"
 
 namespace IOExpansion {
 
@@ -15,6 +16,14 @@ namespace IOExpansion {
     public:
       PCF8575(unsigned int address, std::string filename);
 
+      template<typename C>
+      PCF8575(unsigned int address, std::string filename, int isrPin, C *object, void(C::*method)(void))
+        : PCF8575(address, filename) {
+          interrupt = new HAL::HardwareInterrupt(isrPin, HAL::HardwareInterrupt::Edge::FALLING, object, method);
+      }
+
+      ~PCF8575(void);
+
     public:
       void set_port_direction(unsigned int mask);
       unsigned int read_port(void);
@@ -23,6 +32,8 @@ namespace IOExpansion {
     private:
       void set_all_as_inputs(void);
 
+    private:
+      HAL::HardwareInterrupt * interrupt;
   };
 
 };

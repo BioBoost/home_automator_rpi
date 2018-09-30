@@ -1,12 +1,10 @@
 #include "home_automator.h"
 
 #include <vector>
-#include <wiringPi.h>
 #include <bios_logger/logger.h>
 #include "../factories/mqtt_message_factory.h"
 #include "../factories/event_factory.h"
 
-#define BUTTON_PIN 1
 extern void relay_card_interrupt_handler(void);
 
 namespace BiosHomeAutomator {
@@ -14,18 +12,6 @@ namespace BiosHomeAutomator {
   HomeAutomator::HomeAutomator(MQTTChannel * mqttChannel) {
     this->mqttChannel = mqttChannel;
     this->mqttChannel->subscribe("home/cards/+/relays/+/set", this);
-
-    if (wiringPiSetup () < 0) {
-      // Should throw exception
-      BiosLogger::DoLog.error("Unable to setup wiringPi");
-      return;
-    }
-
-    // Interrupt of io expander is falling edge
-    if (wiringPiISR (BUTTON_PIN, INT_EDGE_FALLING, relay_card_interrupt_handler) < 0) {
-      BiosLogger::DoLog.error("Unable to setup ISR");
-      return;
-    }
   }
 
   HomeAutomator::~HomeAutomator(void) {
@@ -43,20 +29,20 @@ namespace BiosHomeAutomator {
       }
     }
 
+    relayCard->register_change_handler(this, &HomeAutomator::process_changed_inputs);
     relayCards.push_back(relayCard);
   }
 
-  void HomeAutomator::process_changed_inputs(void) {
-    for (unsigned int i = 0; i < relayCards.size(); i++) {
-      std::vector<Input*> inputs = relayCards[i]->get_changed_inputs();
-      for (unsigned int i = 0; i < inputs.size(); i++) {
-        BiosLogger::DoLog.verbose(inputs[i]->to_string());
+  void HomeAutomator::process_changed_inputs(ExpansionCard * card) {
+    BiosLogger::DoLog.debug("Processing changed inputs");
+    std::vector<Input*> inputs = ((IORelayCard*)card)->get_changed_inputs();
+    for (unsigned int i = 0; i < inputs.size(); i++) {
+      BiosLogger::DoLog.verbose(inputs[i]->to_string());
 
-        BiosSimpleMqttClient::MQTTMessage * message = MQTTMessageFactory::create_input_state_update(inputs[i]);
-        if (message) {
-          mqttChannel->publish(*message);
-          delete message;
-        }
+      BiosSimpleMqttClient::MQTTMessage * message = MQTTMessageFactory::create_input_state_update(inputs[i]);
+      if (message) {
+        mqttChannel->publish(*message);
+        delete message;
       }
     }
   }
