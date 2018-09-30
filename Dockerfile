@@ -35,8 +35,8 @@ RUN cd /usr/local/src/paho.mqtt.cpp && \
     /sbin/ldconfig
 
 RUN cd /usr/local/src && \
-    git clone git://git.drogon.net/wiringPi && \
-    cd wiringPi && \
+    git clone https://github.com/BioBoost/wiringPi.git && \
+    cd wiringPi && git checkout 69b90a0964c0996469e399824c9d63707ff1e497 && \
     ./build
 
 RUN cd /usr/local/include/ && \
@@ -70,8 +70,11 @@ RUN cd /usr/local/src && \
     make && \
     make install
 
-# Copy the main application and compile it
-COPY . .
+# Copy the current version of the main application
+# COPY . .
+
+# Ur get the latest stable version of master branch
+RUN git clone https://github.com/BioBoost/home_automator_rpi.git .
 RUN make clean && make
 
 CMD ./bin/home_automator
