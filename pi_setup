@@ -1,0 +1,153 @@
+# Call me with: 
+#    curl -sL https://raw.githubusercontent.com/BioBoost/home_automator_rpi/develop/pi_setup | bash -s --
+
+echo "#######################################################"
+echo "#######################################################"
+echo " _   _                                                 "
+echo "| | | |                                                "
+echo "| |_| | ___  _ __ ___   ___                            "
+echo "|  _  |/ _ \| '_ \` _ \ / _ \                           "
+echo "| | | | (_) | | | | | |  __/                           "
+echo "\_____/\___/|_| |_| |_|\___|          _                "
+echo " / _ \      | |                      | |               "
+echo "/ /_\ \_   _| |_ ___  _ __ ___   __ _| |_ ___  _ __    "
+echo "|  _  | | | | __/ _ \| '_ \` _ \ / _\` | __/ _ \| '__|   "
+echo "| | | | |_| | || (_) | | | | | | (_| | || (_) | |      "
+echo "\_| |_/\__,_|\______/__| |_|_______,_|\__\___/|_|  _   "
+echo "| |           | ___ (_)     | ___ \               | |  "
+echo "| |__  _   _  | |_/ /_  ___ | |_/ / ___   ___  ___| |_ "
+echo "| '_ \| | | | | ___ \ |/ _ \| ___ \/ _ \ / _ \/ __| __|"
+echo "| |_) | |_| | | |_/ / | (_) | |_/ / (_) | (_) \__ \ |_ "
+echo "|_.__/ \__, | \____/|_|\___/\____/ \___/ \___/|___/\__|"
+echo "        __/ |                                          "
+echo "       |___/                                           "
+echo "#######################################################"
+echo "#######################################################"
+
+# Should probable ask this too
+TAG="v1.1.0"
+
+# First ask user some information
+echo "Please enter IDENTIFIER for RPi:"
+read identifier
+
+# Ask user for the IP address
+echo "Please enter the IP address for the Pi"
+read ip_address
+
+# Ask for type of host (dev or prod)
+host_type="xxx"
+while [ "$host_type" != "dev" ] && [ "$host_type" != "prod" ]; do
+  echo "Using this host as [prod]uction or [dev]elopment? "
+  read host_type
+done
+
+# Create file as identifier
+cd
+touch $identifier
+
+# Change password of pi user
+echo "Changing password of raspberry pi user"
+sudo passwd pi
+
+# Upgrade
+sudo apt update
+sudo apt upgrade
+
+# Install some needed packages
+sudo apt install git
+
+# Setup ssh keys
+mkdir -p .ssh
+curl https://github.com/bioboost.keys > .ssh/authorized_keys
+chmod 700 .ssh
+chmod 600 .ssh/authorized_keys
+
+# Setup docker
+curl -sSL https://get.docker.com | sh
+sudo systemctl enable docker
+sudo systemctl start docker
+sudo usermod -aG docker pi
+# Euhm cannot execute as pi for docker?
+
+# Install docker compose
+sudo apt install python-pip
+sudo pip install docker-compose
+
+# Setup share folder
+cd
+mkdir -p automator_share
+cd automator_share
+if [ -d home_automator_rpi ]; then
+  rm -rf home_automator_rpi
+fi
+
+git clone https://github.com/BioBoost/home_automator_rpi.git
+cd home_automator_rpi
+if [ "$host_type" == "dev" ]; then
+  git checkout develop
+else
+  git checkout $TAG
+fi
+
+# Setup Samba if development
+if [ "$host_type" == "dev" ]; then
+  sudo apt-get install samba samba-common-bin
+
+  # Uncomment workgroup and wins support if commented
+  sudo sed -i '/^#.*workgroup/s/^#//' /etc/samba/smb.conf
+  sudo sed -i '/^#.*wins support/s/^#//' /etc/samba/smb.conf
+
+  # Change wins support to yes
+  sudo sed -i -e 's/wins support = no/wins support = yes/g' /etc/samba/smb.conf
+
+  if grep -q "automator_share" /etc/samba/smb.conf; then
+    echo "Share already configured"
+  else
+    echo "# Sharing our Home Automator directory" | sudo tee -a /etc/samba/smb.conf
+    echo "[automator_share]" | sudo tee -a /etc/samba/smb.conf
+    echo " comment=Home Automator Share" | sudo tee -a /etc/samba/smb.conf
+    echo " path=/home/pi/automator_share" | sudo tee -a /etc/samba/smb.conf
+    echo " browseable=yes" | sudo tee -a /etc/samba/smb.conf
+    echo " writeable=yes" | sudo tee -a /etc/samba/smb.conf
+    echo " only guest=no" | sudo tee -a /etc/samba/smb.conf
+    echo " public=no" | sudo tee -a /etc/samba/smb.conf
+  fi
+
+  echo "Please enter password for samba share"
+  sudo smbpasswd -a pi
+fi
+
+# Setup static IP address
+if grep -q "automator" /etc/dhcpcd.conf; then
+  echo "Static IP already configured"
+else
+  echo "# Static IP configuration for automator:" | sudo tee -a /etc/dhcpcd.conf
+  echo "interface eth0" | sudo tee -a /etc/dhcpcd.conf
+  echo "static ip_address=$ip_address/24" | sudo tee -a /etc/dhcpcd.conf
+  echo "static routers=10.0.0.138" | sudo tee -a /etc/dhcpcd.conf
+  echo "static domain_name_servers=10.0.0.138 8.8.8.8 fd51:42f8:caae:d92e::1" | sudo tee -a /etc/dhcpcd.conf
+fi
+
+echo "#######################################################"
+echo "#######################################################"
+echo " _   _                                                 "
+echo "| | | |                                                "
+echo "| |_| | ___  _ __ ___   ___                            "
+echo "|  _  |/ _ \| '_ \` _ \ / _ \                           "
+echo "| | | | (_) | | | | | |  __/                           "
+echo "\_____/\___/|_| |_| |_|\___|          _                "
+echo " / _ \      | |                      | |               "
+echo "/ /_\ \_   _| |_ ___  _ __ ___   __ _| |_ ___  _ __    "
+echo "|  _  | | | | __/ _ \| '_ \` _ \ / _\` | __/ _ \| '__|   "
+echo "| | | | |_| | || (_) | | | | | | (_| | || (_) | |      "
+echo "\_| |_/\__,_|\______/__| |_|_______,_|\__\___/|_|  _   "
+echo "| |           | ___ (_)     | ___ \               | |  "
+echo "| |__  _   _  | |_/ /_  ___ | |_/ / ___   ___  ___| |_ "
+echo "| '_ \| | | | | ___ \ |/ _ \| ___ \/ _ \ / _ \/ __| __|"
+echo "| |_) | |_| | | |_/ / | (_) | |_/ / (_) | (_) \__ \ |_ "
+echo "|_.__/ \__, | \____/|_|\___/\____/ \___/ \___/|___/\__|"
+echo "        __/ |                                          "
+echo "       |___/                                           "
+echo "#######################################################"
+echo "#######################################################"
