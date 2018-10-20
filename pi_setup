@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Call me with: 
-#    curl -O https://raw.githubusercontent.com/BioBoost/home_automator_rpi/master/pi_setup && chmod u+x pi_setup && ./pi_setup
+#    curl -O https://raw.githubusercontent.com/BioBoost/home_automator_rpi/develop/pi_setup && chmod u+x pi_setup && ./pi_setup
 
 echo "#######################################################"
 echo "#######################################################"
