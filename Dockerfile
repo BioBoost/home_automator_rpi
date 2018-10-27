@@ -1,10 +1,4 @@
 FROM resin/rpi-raspbian:stretch-20180815
-ENTRYPOINT []
-
-# Configure the main working directory. This is the base
-# directory used in any further RUN, COPY, and ENTRYPOINT
-# commands.
-WORKDIR /app
 
 RUN apt-get update && \
     apt-get -qy install git build-essential gcc make cmake cmake-gui cmake-curses-gui libssl-dev \
@@ -70,11 +64,16 @@ RUN cd /usr/local/src && \
     make && \
     make install
 
+# Configure the main working directory. This is the base
+# directory used in any further RUN, COPY, and ENTRYPOINT
+# commands.
+WORKDIR /app
+
 # Copy the current version of the main application
-# COPY . .
+COPY . .
 
 # Ur get the latest stable version of master branch
-RUN git clone https://github.com/BioBoost/home_automator_rpi.git .
+# RUN git clone https://github.com/BioBoost/home_automator_rpi.git .
 RUN make clean && make
 
 CMD ./bin/home_automator
