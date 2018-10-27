@@ -130,6 +130,13 @@ else
   echo "static domain_name_servers=10.0.0.138 8.8.8.8 fd51:42f8:caae:d92e::1" | sudo tee -a /etc/dhcpcd.conf
 fi
 
+# Enable the i2c bus device
+# Uncomment dtparam=i2c_arm=on in /boot/config.txt
+sudo sed -i '/^#.*dtparam=i2c_arm=on/s/^#//' /boot/config.txt
+sudo touch /etc/modprobe.d/raspi-blacklist.conf
+modprobe i2c_bcm2835
+modprobe i2c_dev
+
 echo "#######################################################"
 echo "#######################################################"
 echo " _   _                                                 "
