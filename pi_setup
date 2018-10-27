@@ -117,6 +117,8 @@ if [ "$host_type" == "dev" ]; then
 
   echo "Please enter password for samba share"
   sudo smbpasswd -a pi
+
+  sudo systemctl restart smbd
 fi
 
 # Setup static IP address
