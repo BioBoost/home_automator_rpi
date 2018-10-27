@@ -26,7 +26,7 @@ echo "#######################################################"
 echo "#######################################################"
 
 # Should probable ask this too
-TAG="v1.1.0"
+TAG="v1.1.1"
 
 # First ask user some information
 echo "Please enter IDENTIFIER for RPi:"
