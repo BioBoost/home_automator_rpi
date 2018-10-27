@@ -93,7 +93,7 @@ fi
 
 # Setup Samba if development
 if [ "$host_type" == "dev" ]; then
-  sudo apt-get install samba samba-common-bin
+  sudo apt -y install samba samba-common-bin
 
   # Uncomment workgroup and wins support if commented
   sudo sed -i '/^#.*workgroup/s/^#//' /etc/samba/smb.conf
