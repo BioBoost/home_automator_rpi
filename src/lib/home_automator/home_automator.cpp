@@ -29,6 +29,7 @@ namespace BiosHomeAutomator {
       }
     }
 
+    BiosLogger::DoLog.verbose("Registering card with id = " + std::to_string(relayCard->get_id()));
     relayCard->register_change_handler(this, &HomeAutomator::process_changed_inputs);
     relayCards.push_back(relayCard);
   }
