@@ -1,0 +1,20 @@
+{
+  "mqtt": {
+    "server": "tcp://xxx.xxx.xxx.xxx:1883",
+    "client_id": "XXXXXXXXXXXXXXXXX"
+  },
+  "cards": [
+    {
+      "type": "iorelay",
+      "id": 0,
+      "i2c": {
+        "address": 32
+      },
+      "pins": [
+        {
+          "input_changed_isr": 1
+        }
+      ]
+    }
+  ]
+}
