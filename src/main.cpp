@@ -1,9 +1,10 @@
-#include "lib/home_automator/home_automator.h"
 #include <bios_logger/logger.h>
+#include "lib/home_automator/home_automator.h"
 #include <bios_logger/writers/terminal_log_writer.h>
 #include <bios_logger/writers/remote_rest_log_writer.h>
 #include "lib/factories/mqtt_channel_factory.h"
 #include "lib/factories/expansion_card_factory.h"
+#include "lib/config/json_config_parser.h"
 
 using namespace BiosHomeAutomator;
 using namespace BiosLogger;
@@ -21,23 +22,16 @@ int main(void) {
   DoLog.info("Starting Home Automator ...");
   DoLog.info("Current version: " + VERSION);
 
-  MQTTConfig mqttConfig {
-    "tcp://10.0.0.200:1883",
-    "fdgt365354243543255343"
-  };
+  JsonConfigParser parser("config.json");
+  MQTTConfig mqttConfig = parser.mqtt();
 
-  DoLog.info("MQTT Server: " + mqttConfig.server);
-  DoLog.info("MQTT Client ID: " + mqttConfig.client_id);
-
-  MQTTChannel * mqttChannel = MQTTChannelFactory::create_channel(mqttConfig);
+  MQTTChannel * mqttChannel = MQTTChannelFactory::create_channel(parser.mqtt());
   HomeAutomator * automator = new HomeAutomator(mqttChannel);
 
-  IORelayCardConfig relayCardConfig {
-    5,    // id
-    0x20, // i2c address
-    1     // isr pin
-  };
-  automator->add_card(ExpansionCardFactory::create_card(relayCardConfig));
+  // This is not yet as it should be. Here we need to know what types exist!
+  for (IORelayCardConfig cardConfig : parser.io_relay_cards()) {
+    automator->add_card(ExpansionCardFactory::create_card(cardConfig));
+  }
 
   DoLog.info("All ready for action ...");
 
